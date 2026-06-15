@@ -1,6 +1,7 @@
 import { loadConfig, saveConfig, hasConfig } from './config.js';
 import * as api from './tandoor.js';
 import * as store from './store.js';
+import { VERSION } from './version.js';
 
 const listEl = document.getElementById('list');
 const toastEl = document.getElementById('toast');
@@ -80,23 +81,49 @@ function render() {
   }
 }
 
+function plural(n, noun) {
+  return `${n} ${noun}${n === 1 ? '' : 's'}`;
+}
+
+function syncSummary(cleared, added, remaining) {
+  const parts = [];
+  if (cleared) parts.push(`Checked off ${cleared}`);
+  if (added) parts.push(`Added ${added}`);
+  if (remaining === 0) parts.push(cleared || added ? 'list clear' : 'List empty');
+  else parts.push(`${plural(remaining, 'item')} left`);
+  return parts.join(' · ');
+}
+
 async function refresh() {
   if (!hasConfig()) return openSettings();
   const cfg = loadConfig();
   toast('Syncing…');
+  const prevIds = new Set(items.map((i) => i.id));
   try {
     const queue = store.loadQueue();
     const on = queue.filter((c) => c.checked).map((c) => c.id);
     const off = queue.filter((c) => !c.checked).map((c) => c.id);
-    if (on.length) await api.bulkSetChecked(cfg, on, true);
+    // Un-checks go back to Tandoor; completed items are deleted so the Done
+    // list actually clears. Both run before clearQueue so an offline failure
+    // bubbles up and the pending changes survive for the next sync.
     if (off.length) await api.bulkSetChecked(cfg, off, false);
+    let cleared = await api.deleteEntries(cfg, on);
     store.clearQueue();
-    const pushed = on.length + off.length;
 
     items = await api.fetchShoppingList(cfg);
+    // Sweep any entries already checked elsewhere (e.g. another device).
+    const stragglers = items.filter((i) => i.checked).map((i) => i.id);
+    try {
+      cleared += await api.deleteEntries(cfg, stragglers);
+      items = items.filter((i) => !i.checked);
+    } catch {
+      /* couldn't delete — leave them and retry next sync */
+    }
+
     store.saveCachedList(items);
     render();
-    toast(pushed ? `Synced ${pushed} · ${items.length} items` : `${items.length} items`);
+    const added = items.filter((i) => !prevIds.has(i.id)).length;
+    toast(syncSummary(cleared, added, items.length));
   } catch (e) {
     items = store.loadCachedList();
     render();
@@ -172,6 +199,8 @@ function toast(msg) {
 }
 
 function init() {
+  const ver = document.querySelector('.ver');
+  if (ver) ver.textContent = `v${VERSION}`;
   items = store.loadCachedList();
   render();
   if (hasConfig()) refresh();

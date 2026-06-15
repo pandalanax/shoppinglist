@@ -56,6 +56,28 @@ export async function setItemChecked({ serverUrl, token }, id, checked) {
   return true;
 }
 
+export async function deleteEntries(cfg, ids) {
+  if (!ids.length) return 0;
+  const base = apiBaseUrl(cfg.serverUrl);
+  let deleted = 0;
+  for (const id of ids) {
+    const res = await fetch(`${base}/shopping-list-entry/${id}/?format=json`, {
+      method: 'DELETE',
+      headers: headers(cfg.token),
+    });
+    // 404 = already gone — treat as deleted. Network errors reject and bubble
+    // up so the caller keeps the queue and retries on the next sync.
+    if (res.ok || res.status === 404) {
+      deleted++;
+      continue;
+    }
+    const err = new Error(`DELETE failed: ${res.status}`);
+    err.status = res.status;
+    throw err;
+  }
+  return deleted;
+}
+
 export async function bulkSetChecked(cfg, ids, checked) {
   if (!ids.length) return true;
   const base = apiBaseUrl(cfg.serverUrl);
