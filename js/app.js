@@ -91,11 +91,12 @@ async function refresh() {
     if (on.length) await api.bulkSetChecked(cfg, on, true);
     if (off.length) await api.bulkSetChecked(cfg, off, false);
     store.clearQueue();
+    const pushed = on.length + off.length;
 
     items = await api.fetchShoppingList(cfg);
     store.saveCachedList(items);
     render();
-    toast('Up to date');
+    toast(pushed ? `Synced ${pushed} · ${items.length} items` : `${items.length} items`);
   } catch (e) {
     items = store.loadCachedList();
     render();
@@ -135,34 +136,14 @@ document.getElementById('settingsForm').addEventListener('submit', () => {
 document.getElementById('settingsBtn').addEventListener('click', openSettings);
 document.getElementById('refreshBtn').addEventListener('click', refresh);
 
-const pasteMsg = settingsEl.querySelector('#pasteMsg');
-settingsEl.querySelectorAll('.paste').forEach((btn) => {
-  btn.addEventListener('click', async () => {
-    const input = document.getElementById(btn.dataset.target);
-    if (!navigator.clipboard || !navigator.clipboard.readText) {
-      pasteMsg.textContent = 'Clipboard API unavailable here. Type a character in the field, then long-press to Paste.';
-      return;
-    }
-    try {
-      const text = (await navigator.clipboard.readText()).trim();
-      if (text) {
-        input.value = text;
-        pasteMsg.textContent = `Pasted into ${btn.dataset.target}.`;
-      } else {
-        pasteMsg.textContent = 'Clipboard is empty.';
-      }
-    } catch (e) {
-      pasteMsg.textContent = `Paste blocked: ${e && e.message ? e.message : e}`;
-    }
-  });
-});
-
 let pullStartY = null;
 let pulling = false;
 const PULL_THRESHOLD = 70;
 
 document.addEventListener('touchstart', (e) => {
-  pullStartY = window.scrollY <= 0 ? e.touches[0].clientY : null;
+  // Don't track pulls while the settings dialog is open — stray page touches
+  // during an iOS clipboard "Paste" callout would reject the read.
+  pullStartY = !settingsEl.open && window.scrollY <= 0 ? e.touches[0].clientY : null;
   pulling = false;
 }, { passive: true });
 
