@@ -32,12 +32,20 @@
     <form method="dialog" id="settingsForm">
       <h2>Settings</h2>
       <label>Server URL
-        <input type="url" id="serverUrl" placeholder="https://recipes.example.com" required />
+        <span class="field">
+          <input type="url" id="serverUrl" placeholder="https://recipes.example.com" required
+                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+          <button type="button" class="paste" data-target="serverUrl">Paste</button>
+        </span>
       </label>
       <label>API Token
-        <input type="text" id="token" placeholder="Tandoor API token" required
-               autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+        <span class="field">
+          <input type="text" id="token" placeholder="Tandoor API token" required
+                 autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" />
+          <button type="button" class="paste" data-target="token">Paste</button>
+        </span>
       </label>
+      <p class="paste-msg" id="pasteMsg" aria-live="polite"></p>
       <menu>
         <button value="cancel">Cancel</button>
         <button value="save" id="saveSettings">Save</button>

@@ -87,6 +87,10 @@ html, body {
 .sheet h2 { margin-top: 0; }
 .sheet label { display: block; margin: 12px 0; font-size: 14px; }
 .sheet input { width: 100%; padding: 10px; font-size: 16px; margin-top: 4px; }
+.field { display: flex; gap: 8px; align-items: stretch; }
+.field input { flex: 1 1 auto; min-width: 0; }
+.field .paste { flex: 0 0 auto; margin-top: 4px; padding: 0 14px; font-size: 14px; border: 1px solid var(--fg); border-radius: 6px; background: var(--bg); color: var(--fg); }
+.paste-msg { margin: 8px 0 0; font-size: 13px; color: var(--muted); min-height: 1em; }
 .sheet menu { display: flex; justify-content: flex-end; gap: 10px; padding: 0; margin: 16px 0 0; }
 .sheet menu button { padding: 8px 16px; font-size: 15px; }
 
