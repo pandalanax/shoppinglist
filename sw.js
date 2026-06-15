@@ -1,4 +1,4 @@
-const CACHE = 'shopping-shell-v3';
+const CACHE = 'shopping-shell-v4';
 const SHELL = [
   './',
   './index.html',
@@ -24,8 +24,19 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+// Network-first for the app shell so updates land without reinstalling.
+// Cache is only a fallback when offline. API calls (/api/) are never touched.
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
+  if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
   if (url.pathname.includes('/api/')) return;
-  e.respondWith(caches.match(e.request).then((hit) => hit || fetch(e.request)));
+  e.respondWith(
+    fetch(e.request)
+      .then((res) => {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(e.request, copy));
+        return res;
+      })
+      .catch(() => caches.match(e.request).then((hit) => hit || caches.match('./index.html')))
+  );
 });

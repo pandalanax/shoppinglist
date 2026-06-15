@@ -29,6 +29,7 @@ html, body {
   border-bottom: 2px solid var(--fg);
 }
 .app-header h1 { font-size: 18px; margin: 0; }
+.app-header .ver { font-size: 11px; font-weight: 400; color: var(--muted); vertical-align: middle; }
 .app-header__actions button {
   font-size: 20px;
   background: none;
