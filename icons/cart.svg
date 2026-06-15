@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#ffffff"/>
+  <g fill="none" stroke="#111111" stroke-width="26" stroke-linecap="round" stroke-linejoin="round">
+    <!-- handle + basket back edge -->
+    <path d="M112 156 H160 L200 214"/>
+    <!-- basket (trapezoid, wider at top) -->
+    <path d="M200 214 H410 L372 320 H238 Z"/>
+    <!-- inner divider lines -->
+    <path d="M268 214 V320" stroke-width="18"/>
+    <path d="M336 214 V320" stroke-width="18"/>
+    <!-- legs to wheels -->
+    <path d="M238 320 L252 350"/>
+    <path d="M372 320 L356 350"/>
+  </g>
+  <!-- wheels -->
+  <circle cx="252" cy="378" r="26" fill="#111111"/>
+  <circle cx="356" cy="378" r="26" fill="#111111"/>
+</svg>

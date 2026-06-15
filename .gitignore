@@ -1,0 +1,5 @@
+# local dev config holding a real token — never commit
+js/dev-config.local.js
+*.local.js
+
+.DS_Store

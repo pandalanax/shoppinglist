@@ -1,0 +1,8 @@
+services:
+  shopping-pwa:
+    build: .
+    image: ghcr.io/OWNER/shopping-pwa:v0.1.0
+    container_name: shopping-pwa
+    restart: unless-stopped
+    ports:
+      - "8088:80"   # front this with your TLS reverse proxy

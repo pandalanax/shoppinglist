@@ -1,0 +1,8 @@
+.git
+*.md
+docs
+Dockerfile
+docker-compose.yml
+.dockerignore
+.github
+icons/cart.svg
