@@ -63,7 +63,6 @@ html, body {
 }
 .item--checked { color: var(--done); }
 .item--checked .item__text { text-decoration: line-through; }
-.item--pending { opacity: 0.6; }
 
 .empty {
   padding: 40px 16px;
