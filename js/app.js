@@ -121,19 +121,16 @@ function openSettings() {
   const c = loadConfig();
   settingsEl.querySelector('#serverUrl').value = c.serverUrl;
   settingsEl.querySelector('#token').value = c.token;
-  // .show() (non-modal) NOT .showModal(): a modal dialog lives in the top
-  // layer with the rest of the document inert, which makes iOS silently drop
-  // the native long-press "Paste" into inputs. Non-modal restores paste.
-  settingsEl.show();
+  settingsEl.hidden = false;
 }
 
-// Non-modal dialogs don't close on Escape automatically — wire it manually.
-settingsEl.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') settingsEl.close('cancel');
+document.getElementById('cancelSettings').addEventListener('click', () => {
+  settingsEl.hidden = true;
 });
 
-document.getElementById('settingsForm').addEventListener('submit', () => {
-  if (settingsEl.returnValue === 'cancel') return;
+document.getElementById('settingsForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  settingsEl.hidden = true;
   saveConfig({
     serverUrl: settingsEl.querySelector('#serverUrl').value,
     token: settingsEl.querySelector('#token').value,
@@ -151,7 +148,7 @@ const PULL_THRESHOLD = 70;
 document.addEventListener('touchstart', (e) => {
   // Don't track pulls while the settings dialog is open — stray page touches
   // during an iOS clipboard "Paste" callout would reject the read.
-  pullStartY = !settingsEl.open && window.scrollY <= 0 ? e.touches[0].clientY : null;
+  pullStartY = settingsEl.hidden && window.scrollY <= 0 ? e.touches[0].clientY : null;
   pulling = false;
 }, { passive: true });
 

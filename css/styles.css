@@ -106,11 +106,13 @@ html, body {
   z-index: 10;
 }
 
-.sheet { border: none; border-radius: 14px; padding: 20px; width: min(92vw, 420px); }
-/* Non-modal dialog: no ::backdrop, no auto-centering — do both by hand.
-   The huge box-shadow fakes the dimmed backdrop a modal would give. */
-.sheet[open] { position: fixed; inset: 0; margin: auto; z-index: 100;
-  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45); }
+/* Plain overlay (not <dialog>): iOS 26 has paste regressions inside the
+   dialog element's top layer. A normal positioned section avoids it. */
+.sheet { position: fixed; inset: 0; z-index: 100; padding: 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(0, 0, 0, 0.45); }
+.sheet[hidden] { display: none; }
+.sheet form { background: var(--bg); border-radius: 14px; padding: 20px; width: min(92vw, 420px); }
 .sheet h2 { margin-top: 0; }
 .sheet label { display: block; margin: 12px 0; font-size: 14px; }
 .sheet input { width: 100%; padding: 10px; font-size: 16px; margin-top: 4px; }
