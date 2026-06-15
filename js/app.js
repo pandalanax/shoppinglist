@@ -121,8 +121,16 @@ function openSettings() {
   const c = loadConfig();
   settingsEl.querySelector('#serverUrl').value = c.serverUrl;
   settingsEl.querySelector('#token').value = c.token;
-  settingsEl.showModal();
+  // .show() (non-modal) NOT .showModal(): a modal dialog lives in the top
+  // layer with the rest of the document inert, which makes iOS silently drop
+  // the native long-press "Paste" into inputs. Non-modal restores paste.
+  settingsEl.show();
 }
+
+// Non-modal dialogs don't close on Escape automatically — wire it manually.
+settingsEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') settingsEl.close('cancel');
+});
 
 document.getElementById('settingsForm').addEventListener('submit', () => {
   if (settingsEl.returnValue === 'cancel') return;
