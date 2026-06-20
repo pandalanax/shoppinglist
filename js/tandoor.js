@@ -1,6 +1,6 @@
 import { apiBaseUrl } from './config.js';
 
-const PAGE_SIZE = 25;
+const PAGE_SIZE = 200;
 const MAX_PAGES = 10;
 
 function headers(token) {
@@ -9,10 +9,11 @@ function headers(token) {
 
 export async function fetchShoppingList({ serverUrl, token }) {
   const base = apiBaseUrl(serverUrl);
-  let url = `${base}/shopping-list-entry/?format=json&page_size=${PAGE_SIZE}`;
+  let nextQuery = `?format=json&page_size=${PAGE_SIZE}`;
   const items = [];
 
-  for (let page = 0; url && page < MAX_PAGES; page++) {
+  for (let page = 0; nextQuery && page < MAX_PAGES; page++) {
+    const url = `${base}/shopping-list-entry/${nextQuery}`;
     const res = await fetch(url, { headers: headers(token) });
     if (!res.ok) {
       const err = new Error(`Fetch failed: ${res.status}`);
@@ -21,6 +22,11 @@ export async function fetchShoppingList({ serverUrl, token }) {
       throw err;
     }
     const data = await res.json();
+    // Tandoor's `next` is an ABSOLUTE url pointing at its own host
+    // (recipes.*), which is cross-origin from the proxied shopping.* origin and
+    // gets blocked by CORS. Keep only its query string and re-issue the request
+    // against our same-origin proxy base.
+    nextQuery = data.next ? new URL(data.next).search : '';
     for (const entry of data.results || []) {
       if (Array.isArray(entry.shopping_lists) && entry.shopping_lists.length > 0) continue;
       const foodName = entry.food?.name || '';
@@ -35,7 +41,6 @@ export async function fetchShoppingList({ serverUrl, token }) {
         pendingSync: false,
       });
     }
-    url = data.next || '';
   }
   return items;
 }
