@@ -1,4 +1,4 @@
-const CACHE = 'shopping-shell-v0.1.10';
+const CACHE = 'shopping-shell-v0.1.11';
 const SHELL = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const SHELL = [
   './js/config.js',
   './js/tandoor.js',
   './js/store.js',
-  './js/version.js',
+  './js/env.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',

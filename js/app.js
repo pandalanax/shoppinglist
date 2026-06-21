@@ -1,7 +1,9 @@
 import { loadConfig, saveConfig, hasConfig } from './config.js';
 import * as api from './tandoor.js';
 import * as store from './store.js';
-import { VERSION } from './version.js';
+
+// Bump on release; keep sw.js CACHE in sync.
+const VERSION = '0.1.11';
 
 const listEl = document.getElementById('list');
 const toastEl = document.getElementById('toast');
@@ -81,16 +83,12 @@ function render() {
   }
 }
 
-function plural(n, noun) {
-  return `${n} ${noun}${n === 1 ? '' : 's'}`;
-}
-
 function syncSummary(cleared, added, remaining) {
   const parts = [];
   if (cleared) parts.push(`Checked off ${cleared}`);
   if (added) parts.push(`Added ${added}`);
   if (remaining === 0) parts.push(cleared || added ? 'list clear' : 'List empty');
-  else parts.push(`${plural(remaining, 'item')} left`);
+  else parts.push(`${remaining} item${remaining === 1 ? '' : 's'} left`);
   return parts.join(' · ');
 }
 
